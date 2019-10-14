@@ -1,0 +1,65 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{17B3B103-440C-41FD-84CF-7AD56612E03B}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>DMagic_Orbital_Science</RootNamespace>
+    <AssemblyName>DMagic Orbital Science</AssemblyName>
+    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <Deterministic>true</Deterministic>
+    <TargetFrameworkProfile>Unity Subset v3.5</TargetFrameworkProfile>
+    <KspDir>$(MSBuildThisFileDirectory)..\..\..\..\_KspDir\</KspDir>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>..\..\..\..\_KspDir\GameData\KerboKatz\AutomatedScienceSampler\Plugins\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <Import Project="$(MSBuildThisFileDirectory)..\..\..\..\KSP-Constellation\_HelperFiles\ReferenceTargets\Assembly-CSharp.targets" />
+  <Import Project="$(MSBuildThisFileDirectory)..\..\..\..\KSP-Constellation\_HelperFiles\ReferenceTargets\UnityEngine.targets" />
+  <Import Project="$(MSBuildThisFileDirectory)..\..\..\..\KSP-Constellation\_HelperFiles\ReferenceTargets\UnityEngine.UI.targets" />
+  <ItemGroup>
+    <Reference Include="DMagic">
+      <HintPath>..\..\..\..\_KspDir\GameData\DMagicOrbitalScience\Plugins\DMagic.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Activator.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\..\KerboKatzUtilities\source\KerboKatzUtilities.csproj">
+      <Project>{0f5b9242-391a-4110-b329-1c06084c45e2}</Project>
+      <Name>KerboKatzUtilities</Name>
+      <Private>False</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\..\AutomatedScienceSampler\AutomatedScienceSampler.csproj">
+      <Project>{a79e0fd9-d546-44a9-9110-56dbe3535471}</Project>
+      <Name>AutomatedScienceSampler</Name>
+      <Private>False</Private>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+</Project>

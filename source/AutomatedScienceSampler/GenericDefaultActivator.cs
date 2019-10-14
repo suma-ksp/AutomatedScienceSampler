@@ -19,6 +19,8 @@ namespace KerboKatz.ASS
                 _typeName = GetType().FullName + ":" + _typeName;
         }
 
+        public bool Silent => _AutomatedScienceSamplerInstance.craftSettings.hideScienceDialog;
+
         AutomatedScienceSampler IScienceActivator.AutomatedScienceSampler
         {
             get { return _AutomatedScienceSamplerInstance; }
@@ -29,7 +31,7 @@ namespace KerboKatz.ASS
             }
         }
 
-        public virtual bool CanRunExperiment(ModuleScienceExperimentReflectionWrapper<T> baseExperiment, float currentScienceValue)
+        public virtual bool CanRunExperiment(ModuleScienceExperimentWrapper<T> baseExperiment, float currentScienceValue)
         {
             Log(baseExperiment.experimentID, ": CanRunExperiment");
             if (!baseExperiment.experiment.IsAvailableWhile(ScienceUtil.GetExperimentSituation(FlightGlobals.ActiveVessel), FlightGlobals.currentMainBody))//
@@ -71,7 +73,7 @@ namespace KerboKatz.ASS
             return true;
         }
 
-        public virtual void DeployExperiment(ModuleScienceExperimentReflectionWrapper<T> baseExperiment)
+        public virtual void DeployExperiment(ModuleScienceExperimentWrapper<T> baseExperiment)
         {
             Log(baseExperiment.experimentID, ": DeployExperiment");
             if (_AutomatedScienceSamplerInstance.craftSettings.hideScienceDialog)
@@ -87,18 +89,18 @@ namespace KerboKatz.ASS
             }
         }
 
-        public virtual ScienceSubject GetScienceSubject(ModuleScienceExperimentReflectionWrapper<T> baseExperiment)
+        public virtual ScienceSubject GetScienceSubject(ModuleScienceExperimentWrapper<T> baseExperiment)
         {
             var currentBiome = CurrentBiome(baseExperiment.experiment);
             return ResearchAndDevelopment.GetExperimentSubject(baseExperiment.experiment, ScienceUtil.GetExperimentSituation(FlightGlobals.ActiveVessel), FlightGlobals.currentMainBody, currentBiome, ScienceUtil.GetBiomedisplayName(FlightGlobals.currentMainBody, currentBiome));
         }
 
-        public virtual float GetScienceValue(ModuleScienceExperimentReflectionWrapper<T> baseExperiment, Dictionary<string, int> shipCotainsExperiments, ScienceSubject currentScienceSubject)
+        public virtual float GetScienceValue(ModuleScienceExperimentWrapper<T> baseExperiment, Dictionary<string, int> shipCotainsExperiments, ScienceSubject currentScienceSubject)
         {
             return Utilities.Science.GetScienceValue(shipCotainsExperiments, baseExperiment.experiment, currentScienceSubject);
         }
 
-        public virtual bool CanReset(ModuleScienceExperimentReflectionWrapper<T> baseExperiment)
+        public virtual bool CanReset(ModuleScienceExperimentWrapper<T> baseExperiment)
         {
             Log(baseExperiment.experimentID, ": CanReset");
             if (!baseExperiment.Inoperable)
@@ -140,13 +142,13 @@ namespace KerboKatz.ASS
             return true;
         }
 
-        public virtual void Reset(ModuleScienceExperimentReflectionWrapper<T> baseExperiment)
+        public virtual void Reset(ModuleScienceExperimentWrapper<T> baseExperiment)
         {
             Log(baseExperiment.experimentID, ": Reseting experiment");
             baseExperiment.ResetExperiment();
         }
 
-        public virtual bool CanTransfer(ModuleScienceExperimentReflectionWrapper<T> baseExperiment, IScienceDataContainer moduleScienceContainer)
+        public virtual bool CanTransfer(ModuleScienceExperimentWrapper<T> baseExperiment, IScienceDataContainer moduleScienceContainer)
         {
             Log(baseExperiment.experimentID, ": CanTransfer");
 
@@ -183,12 +185,12 @@ namespace KerboKatz.ASS
             return true;
         }
 
-        public virtual void Transfer(ModuleScienceExperimentReflectionWrapper<T> baseExperiment, IScienceDataContainer moduleScienceContainer)
+        public virtual void Transfer(ModuleScienceExperimentWrapper<T> baseExperiment, IScienceDataContainer moduleScienceContainer)
         {
             Log(baseExperiment.experimentID, ": transfering");
             try
             {
-                moduleScienceContainer.StoreData(baseExperiment.instance, _AutomatedScienceSamplerInstance.craftSettings.dumpDuplicates, this);
+                moduleScienceContainer.StoreData(baseExperiment.BaseObject, _AutomatedScienceSamplerInstance.craftSettings.dumpDuplicates, this);
                 Log(baseExperiment.experimentID, ": transferred");
             }
             catch (Exception e2)
@@ -205,44 +207,61 @@ namespace KerboKatz.ASS
             return types;
         }
 
+        public void Log(params object[] msg)
+        {
+            if (_AutomatedScienceSamplerInstance == null)
+                return;
+            var debugStringBuilder = new StringBuilder();
+            foreach (var debugString in msg)
+            {
+                debugStringBuilder.Append(debugString.ToString());
+            }
+            _AutomatedScienceSamplerInstance.Log("[" + _typeName + "]", debugStringBuilder);
+        }
+
+        public void Log(LogMode mode, params object[] debugStrings)
+        {
+            Log(debugStrings);
+        }
+
         bool IScienceActivator.CanRunExperiment(ModuleScienceExperiment baseExperiment, float currentScienceValue)
         {
-            return CanRunExperiment(new ModuleScienceExperimentReflectionWrapper<T>((T)baseExperiment), currentScienceValue);
+            return CanRunExperiment(new ModuleScienceExperimentWrapper<T>((T)baseExperiment), currentScienceValue);
         }
 
         void IScienceActivator.DeployExperiment(ModuleScienceExperiment baseExperiment)
         {
-            DeployExperiment(new ModuleScienceExperimentReflectionWrapper<T>((T)baseExperiment));
+            DeployExperiment(new ModuleScienceExperimentWrapper<T>((T)baseExperiment));
         }
 
         ScienceSubject IScienceActivator.GetScienceSubject(ModuleScienceExperiment baseExperiment)
         {
-            return GetScienceSubject(new ModuleScienceExperimentReflectionWrapper<T>((T)baseExperiment));
+            return GetScienceSubject(new ModuleScienceExperimentWrapper<T>((T)baseExperiment));
         }
 
         float IScienceActivator.GetScienceValue(ModuleScienceExperiment baseExperiment, Dictionary<string, int> shipCotainsExperiments, ScienceSubject currentScienceSubject)
         {
-            return GetScienceValue(new ModuleScienceExperimentReflectionWrapper<T>((T)baseExperiment), shipCotainsExperiments, currentScienceSubject);
+            return GetScienceValue(new ModuleScienceExperimentWrapper<T>((T)baseExperiment), shipCotainsExperiments, currentScienceSubject);
         }
 
         bool IScienceActivator.CanReset(ModuleScienceExperiment baseExperiment)
         {
-            return CanReset(new ModuleScienceExperimentReflectionWrapper<T>((T)baseExperiment));
+            return CanReset(new ModuleScienceExperimentWrapper<T>((T)baseExperiment));
         }
 
         void IScienceActivator.Reset(ModuleScienceExperiment baseExperiment)
         {
-            Reset(new ModuleScienceExperimentReflectionWrapper<T>((T)baseExperiment));
+            Reset(new ModuleScienceExperimentWrapper<T>((T)baseExperiment));
         }
 
         bool IScienceActivator.CanTransfer(ModuleScienceExperiment baseExperiment, IScienceDataContainer moduleScienceContainer)
         {
-            return CanTransfer(new ModuleScienceExperimentReflectionWrapper<T>((T)baseExperiment), moduleScienceContainer);
+            return CanTransfer(new ModuleScienceExperimentWrapper<T>((T)baseExperiment), moduleScienceContainer);
         }
 
         void IScienceActivator.Transfer(ModuleScienceExperiment baseExperiment, IScienceDataContainer moduleScienceContainer)
         {
-            Transfer(new ModuleScienceExperimentReflectionWrapper<T>((T)baseExperiment), moduleScienceContainer);
+            Transfer(new ModuleScienceExperimentWrapper<T>((T)baseExperiment), moduleScienceContainer);
         }
 
         protected string CurrentBiome(ScienceExperiment baseExperiment)
@@ -272,23 +291,6 @@ namespace KerboKatz.ASS
                 Log("currentVessel && currentBody == null");
             }
             return string.Empty;
-        }
-
-        public void Log(params object[] msg)
-        {
-            if (_AutomatedScienceSamplerInstance == null)
-                return;
-            var debugStringBuilder = new StringBuilder();
-            foreach (var debugString in msg)
-            {
-                debugStringBuilder.Append(debugString.ToString());
-            }
-            _AutomatedScienceSamplerInstance.Log("[" + _typeName + "]", debugStringBuilder);
-        }
-
-        public void Log(LogMode mode, params object[] debugStrings)
-        {
-            Log(debugStrings);
         }
     }
 }
