@@ -1,0 +1,83 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{A79E0FD9-D546-44A9-9110-56DBE3535471}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>KerboKatz.ASS</RootNamespace>
+    <AssemblyName>AutomatedScienceSampler</AssemblyName>
+    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <Deterministic>true</Deterministic>
+    <TargetFrameworkProfile>Unity Subset v3.5</TargetFrameworkProfile>
+    <KspDir>$(MSBuildThisFileDirectory)..\..\..\_KspDir\</KspDir>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>..\..\..\_KspDir\GameData\KerboKatz\AutomatedScienceSampler\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <Import Project="$(MSBuildThisFileDirectory)..\..\..\KSP-Constellation\_HelperFiles\ReferenceTargets\Assembly-CSharp.targets" />
+  <Import Project="$(MSBuildThisFileDirectory)..\..\..\KSP-Constellation\_HelperFiles\ReferenceTargets\UnityEngine.targets" />
+  <Import Project="$(MSBuildThisFileDirectory)..\..\..\KSP-Constellation\_HelperFiles\ReferenceTargets\UnityEngine.UI.targets" />
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="AutomatedScienceSampler.cs" />
+    <Compile Include="DefaultActivator.cs" />
+    <Compile Include="GenericDefaultActivator.cs" />
+    <Compile Include="IScienceActivator.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Settings.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\KerboKatzUtilities\source\KerboKatzUI\KerboKatz.UI.csproj">
+      <Project>{6cd5cba0-e504-443f-887a-67bc01527e02}</Project>
+      <Name>KerboKatz.UI</Name>
+      <Private>False</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\KerboKatzUtilities\source\KerboKatzUtilities.csproj">
+      <Project>{0f5b9242-391a-4110-b329-1c06084c45e2}</Project>
+      <Name>KerboKatzUtilities</Name>
+      <Private>False</Private>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Plugins\ASS.Plugin.DMagicOrbitalScience.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Plugins\ASS.Plugin.DMModuleScienceAnimateGeneric.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Plugins\ASS.Plugin.StationScience.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="automatedsciencesampler.KerboKatzAsset">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="LICENSE">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+</Project>
