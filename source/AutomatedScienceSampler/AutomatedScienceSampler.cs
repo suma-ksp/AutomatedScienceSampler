@@ -91,14 +91,36 @@ namespace KerboKatz.ASS
 
         private void CheckTypeForScienceActivator(Type type)
         {
-            if (type.GetInterfaces().Contains(typeof(IScienceActivator)) && type.GetConstructor(Type.EmptyTypes) != null && !type.IsGenericType)
+            if (typeof(IScienceActivator).IsAssignableFrom(type) || typeof(IScienceActivatorFactory).IsAssignableFrom(type))
             {
-                var activator = Activator.CreateInstance(type) as IScienceActivator;
+                if (type.GetConstructor(Type.EmptyTypes) == null && !type.IsGenericType)
+                {
+                    Log("Skip ", type, ": No parameterless constructor");
+                    return;
+                }
+                if (type.IsGenericType)
+                {
+                    Log("Skip ", type, ": Generic type definition");
+                    return;
+                }
+                if (type.IsAbstract)
+                {
+                    Log("Skip ", type, ": Abstract");
+                    return;
+                }
+
+                var instance = Activator.CreateInstance(type);
+                var activator = instance as IScienceActivator ?? (instance as IScienceActivatorFactory).GetActivatorInstance();
                 activator.AutomatedScienceSampler = this;
                 Log("Found", activator.GetType());
                 foreach (var validType in activator.GetValidTypes())
                 {
                     Log("...for type: ", validType);
+                    if (activators.ContainsKey(validType))
+                    {
+                        Log("......Skip, already valid via ", activators[validType]);
+                        continue;
+                    }
                     activators.Add(validType, activator);
                 }
             }

@@ -45,6 +45,7 @@
     <Compile Include="DefaultActivator.cs" />
     <Compile Include="GenericDefaultActivator.cs" />
     <Compile Include="IScienceActivator.cs" />
+    <Compile Include="IScienceActivatorFactory.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Settings.cs" />
   </ItemGroup>

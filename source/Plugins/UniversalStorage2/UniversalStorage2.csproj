@@ -8,7 +8,7 @@
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>UniversalStorage2</RootNamespace>
-    <AssemblyName>UniversalStorage2</AssemblyName>
+    <AssemblyName>ASS.Plugin.UniversalStorage2</AssemblyName>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
@@ -49,11 +49,13 @@
   <ItemGroup>
     <Compile Include="Activator.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="ActivatorFactory.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\..\..\KerboKatzUtilities\source\KerboKatzUtilities.csproj">
       <Project>{0f5b9242-391a-4110-b329-1c06084c45e2}</Project>
       <Name>KerboKatzUtilities</Name>
+      <Private>False</Private>
     </ProjectReference>
     <ProjectReference Include="..\..\AutomatedScienceSampler\AutomatedScienceSampler.csproj">
       <Project>{a79e0fd9-d546-44a9-9110-56dbe3535471}</Project>

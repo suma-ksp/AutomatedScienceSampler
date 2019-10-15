@@ -1,46 +1,62 @@
-﻿using KerboKatz;
-using KerboKatz.ASS;
-using KerboKatz.ReflectionWrapper;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Reflection;
+using KerboKatz;
+using KerboKatz.ASS;
+using KerboKatz.ReflectionWrapper;
 
 namespace UniversalStorage2
 {
-    public class Activator : GenericDefaultActivator<USAdvancedScience>
+    internal class Activator<T> : GenericDefaultActivator<T>
+        where T : ModuleScienceExperiment
     {
         /// <inheritdoc />
-        public override float GetScienceValue(ModuleScienceExperimentWrapper<USAdvancedScience> baseExperiment, Dictionary<string, int> shipCotainsExperiments, ScienceSubject currentScienceSubject)
+        public override float GetScienceValue(ModuleScienceExperimentWrapper<T> baseExperimentWrapper, Dictionary<string, int> shipCotainsExperiments, ScienceSubject currentScienceSubject)
         {
-            var scienceExperiment = ResearchAndDevelopment.GetExperiment(baseExperiment.BaseObject.experimentID);
-            Log($"{nameof(GetScienceValue)} => changed from '{baseExperiment.BaseObject.experiment?.id ?? "null"}' to '{scienceExperiment.id}')");
+            var scienceExperiment = ResearchAndDevelopment.GetExperiment(baseExperimentWrapper.BaseObject.experimentID);
+            Log($"{nameof(GetScienceValue)} => changed from '{baseExperimentWrapper.BaseObject.experiment?.id ?? "null"}' to '{scienceExperiment.id}')");
             var result = Utilities.Science.GetScienceValue(shipCotainsExperiments, scienceExperiment, currentScienceSubject);
             Log($"{nameof(GetScienceValue)} results in {result}");
             return result;
         }
 
         /// <inheritdoc />
-        public override void DeployExperiment(ModuleScienceExperimentWrapper<USAdvancedScience> baseExperiment)
+        public override void DeployExperiment(ModuleScienceExperimentWrapper<T> baseExperimentWrapper)
         {
+            var baseExperiment = baseExperimentWrapper as ModuleScienceExperimentWrapper<USAdvancedScience>;
             Log($"{nameof(DeployExperiment)} => {nameof(USAdvancedScience.GatherScienceData)}({Silent})");
             baseExperiment.BaseObject.GatherScienceData(Silent);
         }
 
         /// <inheritdoc />
-        public override ScienceSubject GetScienceSubject(ModuleScienceExperimentWrapper<USAdvancedScience> baseExperiment)
+        public override ScienceSubject GetScienceSubject(ModuleScienceExperimentWrapper<T> baseExperimentWrapper)
         {
-            var scienceExperiment = ResearchAndDevelopment.GetExperiment(baseExperiment.BaseObject.experimentID);
-            Log($"{nameof(GetScienceSubject)} => changed from '{baseExperiment.BaseObject.experiment?.id ?? "null"}' to '{scienceExperiment.id}')");
-            var currentBiome = CurrentBiome(baseExperiment.experiment);
+            var scienceExperiment = ResearchAndDevelopment.GetExperiment(baseExperimentWrapper.BaseObject.experimentID);
+            Log($"{nameof(GetScienceSubject)} => changed from '{baseExperimentWrapper.BaseObject.experiment?.id ?? "null"}' to '{scienceExperiment.id}')");
+            var currentBiome = CurrentBiome(baseExperimentWrapper.experiment);
             var result = ResearchAndDevelopment.GetExperimentSubject(scienceExperiment, ScienceUtil.GetExperimentSituation(FlightGlobals.ActiveVessel), FlightGlobals.currentMainBody, currentBiome, ScienceUtil.GetBiomedisplayName(FlightGlobals.currentMainBody, currentBiome));
             Log($"{nameof(GetScienceSubject)} results in '{result.id}' / '{result.title}'");
             return result;
         }
 
-        /// <inheritdoc />
-        public override bool CanRunExperiment(ModuleScienceExperimentWrapper<USAdvancedScience> baseExperiment, float currentScienceValue)
+        public override void Transfer(ModuleScienceExperimentWrapper<T> baseExperimentWrapper, IScienceDataContainer moduleScienceContainer)
         {
-            if (!base.CanRunExperiment(baseExperiment, currentScienceValue))
+            var baseExperiment = (baseExperimentWrapper as ModuleScienceExperimentWrapper<USAdvancedScience>).BaseObject;
+            var before = baseExperimentWrapper.GetScienceCount();
+            base.Transfer(baseExperimentWrapper, moduleScienceContainer);
+            var mid = baseExperimentWrapper.GetScienceCount();
+            foreach (var one in baseExperimentWrapper.GetData())
+                baseExperiment.DumpData(one);
+            var after = baseExperimentWrapper.GetScienceCount();
+            Log($"Transfer ScienceCount Before / AfterTransmit / AfterDump: {before} / {mid} / {after}");
+            if(after == 0)
+                baseExperiment.ResetExperiment();
+        }
+
+        /// <inheritdoc />
+        public override bool CanRunExperiment(ModuleScienceExperimentWrapper<T> baseExperimentWrapper, float currentScienceValue)
+        {
+            if (!base.CanRunExperiment(baseExperimentWrapper, currentScienceValue))
             {
                 Log($"{nameof(CanRunExperiment)} => base.CanRunExperiment results in false");
                 return false;
@@ -57,7 +73,7 @@ namespace UniversalStorage2
                     throw new InvalidOperationException($"Method CanConduct has wrong parameterCount ({m.GetParameters().Length})");
                 if (m.GetParameters()[0].ParameterType != typeof(bool))
                     throw new InvalidOperationException($"Method CanConduct has wrong parameterType ({m.GetParameters()[0].ParameterType.FullName})");
-                var result = (bool)m.Invoke(baseExperiment.BaseObject, new object[] { Silent });
+                var result = (bool)m.Invoke(baseExperimentWrapper.BaseObject, new object[] { Silent });
                 Log($"{nameof(CanRunExperiment)} => CanConduct results {result}");
                 return result;
             }
@@ -67,6 +83,11 @@ namespace UniversalStorage2
                 Log(e);
                 return true;
             }
+        }
+
+        public override void Reset(ModuleScienceExperimentWrapper<T> baseExperiment)
+        {
+            base.Reset(baseExperiment);
         }
     }
 }

@@ -8,7 +8,7 @@
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>DMagic_Orbital_Science</RootNamespace>
-    <AssemblyName>DMagic Orbital Science</AssemblyName>
+    <AssemblyName>ASS.Plugin.DMagicOrbitalScience</AssemblyName>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
@@ -38,6 +38,7 @@
   <ItemGroup>
     <Reference Include="DMagic">
       <HintPath>..\..\..\..\_KspDir\GameData\DMagicOrbitalScience\Plugins\DMagic.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
